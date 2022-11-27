@@ -26,10 +26,8 @@ def display_meigen():
         for number, meigen in enumerate(meigen_list):
             yield meigen_label.config(text=meigen_list[number])
 
-
+# ジェネレーターを利用して指定秒数単位で繰り返し名言を流す
 c = display_meigen()
-
-
 def update():
     meigen_label.config(text=next(c))
     meigen_label.after(10000, update)
@@ -42,6 +40,7 @@ window = Tk()
 # root = tkinter.Tk()
 window.title("You have my support")
 window.config(padx=100, pady=50, bg=YELLOW)
+window.attributes("-topmost", True) # メインウインドウを最前面に出す処理
 
 # root.iconbitmap('') # 利用するのであれば
 window.geometry('500x100')  # ウインドウのサイズ
