@@ -2,6 +2,8 @@
 # import tkinter.filedialog
 import tkinter
 from tkinter import *
+import math
+import time
 
 # ---------------------------- 定数 ---------------------------- #
 # 色
@@ -9,6 +11,8 @@ PINK = "#e2979c"
 RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
+BRLUE = "#0072BC"
+FONT_NAME = "Courier"
 
 # ---------------------------- 関数作成 ---------------------------- #
 
@@ -40,18 +44,35 @@ meigen_list = ["悲しかったら鏡を見なさい 苦しかったら手を合
 
 
 not_stop = 0
-
-
 def display_meigen():
     while not_stop == 0:
         for number, meigen in enumerate(meigen_list):
             yield meigen_label.config(text=meigen_list[number])
+
 
 # ジェネレーターを利用して指定秒数単位で繰り返し名言を流す
 c = display_meigen()
 def update():
     meigen_label.config(text=next(c))
     meigen_label.after(10000, update)
+
+timer = True
+
+# def start_button():
+#     meigen_label.after(1000, update)
+
+def start_button():
+    count = 0
+    while timer:
+        count_min = math.floor(count / 60)
+        count_sec = count % 60
+        timer_label.config(text=f"{count_min}:{count_sec}")
+        count += 1
+
+
+
+
+
 
 
 # ---------------------------- UI Setup ---------------------------- #
@@ -65,11 +86,17 @@ window.attributes("-topmost", True) # メインウインドウを最前面に出
 
 # root.iconbitmap('') # 利用するのであれば
 window.geometry('1000x70')  # ウインドウのサイズ
-window.resizable(0, 0)  # ウインドウサイズの変更。許可しない
+# window.resizable(0, 0)  # ウインドウサイズの変更。許可しない
 
 # 　名言ラベル
-meigen_label = Label(text="自分を励ますために", fg=RED, bg=YELLOW, font=("ＭＳ ゴシック", 20),wraplength=800, anchor='e', justify='left')
-meigen_label.grid(column=0, row=0)
-meigen_label.after(1000, update)
+meigen_label = Label(text="自分を励ますために", fg=BRLUE, bg=YELLOW, font=("ＭＳ ゴシック", 20),wraplength=800, anchor='e', justify='left')
+meigen_label.grid(column=0, row=1)
+# meigen_label.after(1000, update)
+
+timer_label = Label(text="00:00", bg=YELLOW, fg=GREEN, font=("ＭＳ ゴシック", 20), anchor='e', justify='left')
+timer_label.grid(column=0, row=0)
+
+start_button = Button(text="Start", bg=YELLOW, fg=GREEN, highlightthickness=0, command=start_button)
+start_button.grid(column=1, row=0)
 
 window.mainloop()
