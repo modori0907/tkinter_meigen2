@@ -11,7 +11,7 @@ FONT_NAMA = "Courier"
 
 window = Tk()
 window.title("You can do it")
-# window.config(padx=100, pady=10)
+window.config(padx=100, pady=10, bg=YELLOW)
 
 # キャンバスを作成
 canvas = Canvas(width=300, height=300) # キャンバスのサイズ
