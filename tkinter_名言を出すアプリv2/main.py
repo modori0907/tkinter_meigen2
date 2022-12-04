@@ -41,7 +41,7 @@ def display_meigen(count):
     if len(meigen_list) == count:
         print(len(meigen_list))
         print(f"{count}count")
-        count = 0
+        window.after(5000, display_meigen, 0) # 繰り返し処理用。カウントを0にする
     else:
         canvas.itemconfig(meigen_text, text=meigen_list[count])
         window.after(5000, display_meigen, count + 1)
