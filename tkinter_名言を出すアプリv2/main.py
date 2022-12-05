@@ -41,8 +41,8 @@ def start_timer():
 def display_meigen(count):
     if len(meigen_list) == count:
         window.after(5000, display_meigen, 0) # 繰り返し処理用。カウントを0にする
-    global timer
     canvas.itemconfig(meigen_text, text=meigen_list[count])
+    global timer
     timer = window.after(5000, display_meigen, count + 1)
 
 # --- count --- #
@@ -56,13 +56,10 @@ def count_up(count):
     global timer
     timer = window.after(1000,count_up, count +1)
 
-
 def stop_timer():
     window.after_cancel(timer)
     canvas.itemconfig(timer_text, text="00:00")
     canvas.itemconfig(meigen_text, text="")
-
-
 
 
 # --------------------------- CONSTANTS --------------------------- #
