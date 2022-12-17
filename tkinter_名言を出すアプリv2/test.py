@@ -1,19 +1,60 @@
 import json
 
 
-coins = [
-    {
-        "symbol" : "BTC",
-        "amount_owned": 2,
-        "price_per_coin": 3200
-    },
-    {
-        "symbol": "BTS",
-        "amount_owned": 4,
-        "price_per_coin": 6200
-    }
-]
+# coins = [
+#     {
+#         "symbol" : "BTC",
+#         "amount_owned": 2,
+#         "price_per_coin": 3200
+#     },
+#     {
+#         "symbol": "BTS",
+#         "amount_owned": 4,
+#         "price_per_coin": 6200
+#     }
+# ]
+#
+# for coin in coins:
+#     print(coin["price_per_coin"])
 
-for coin in coins:
-    print(coin["price_per_coin"])
 
+
+"""ジェネレーターの試験"""
+# def power(values):
+#     for value in values:
+#         print('%sを供給' % value)
+#         yield value
+
+# def adder(values):
+#     for value in values:
+#         print('%sに値を追加' % value)
+#         if value % 2 == 0:
+#             yield value + 3
+#         else:
+#             yield value + 2
+# elements = [1, 4, 7, 9, 12, 19]
+# results = adder(power(elements))
+#
+# print(next(results))
+# print(next(results))
+# print(next(results))
+
+
+# def psychologist():
+#     print('Please your annoying?')
+#     while True:
+#         answer = (yield)
+#         if answer is not None:
+#             if answer.endswith('?'):
+#                 print("Don't ask yourself a lots")
+#             elif 'Good' in answer:
+#                 print("It's good idea. Let's do it")
+#             elif 'Bad' in answer:
+#                 print("Don't think bad things")
+#
+# free = psychologist()
+# next(free)
+# free.send('Bad')
+# free.send('I do not know?')
+
+print(5010 % 60)
