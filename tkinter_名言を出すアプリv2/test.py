@@ -1,5 +1,3 @@
-import json
-
 # coins = [
 #     {
 #         "symbol" : "BTC",
@@ -18,7 +16,6 @@ import json
 
 
 """ジェネレーターの試験"""
-
 
 # def power(values):
 #     for value in values:
@@ -60,18 +57,18 @@ import json
 
 # クラス変数のテスト
 #
-class T(object):
-    def __init__(self, meigens, *args, **kwargs):
-        self.meigens = meigens
-        print(self.meigens)
-    def testprint(self):
-        for meigen in self.meigens:
-            print(meigen)
-
-test = [1,2,3,4,5]
-t = T(test)
-
-t.testprint()
+# class T(object):
+#     def __init__(self, meigens, *args, **kwargs):
+#         self.meigens = meigens
+#         print(self.meigens)
+#     def testprint(self):
+#         for meigen in self.meigens:
+#             print(meigen)
+#
+# test = [1,2,3,4,5]
+# t = T(test)
+#
+# t.testprint()
 
 
 # class Person(object):
@@ -87,3 +84,13 @@ t.testprint()
 #
 # person = Person()
 # person.say_something()
+
+
+# 辞書
+
+test_dic = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8]
+]
+print(test_dic[0][1])
+print(test_dic[1][3])
