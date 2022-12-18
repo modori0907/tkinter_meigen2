@@ -1,6 +1,5 @@
 import json
 
-
 # coins = [
 #     {
 #         "symbol" : "BTC",
@@ -18,8 +17,9 @@ import json
 #     print(coin["price_per_coin"])
 
 
-
 """ジェネレーターの試験"""
+
+
 # def power(values):
 #     for value in values:
 #         print('%sを供給' % value)
@@ -57,4 +57,33 @@ import json
 # free.send('Bad')
 # free.send('I do not know?')
 
-print(5010 % 60)
+
+# クラス変数のテスト
+#
+class T(object):
+    def __init__(self, meigens, *args, **kwargs):
+        self.meigens = meigens
+        print(self.meigens)
+    def testprint(self):
+        for meigen in self.meigens:
+            print(meigen)
+
+test = [1,2,3,4,5]
+t = T(test)
+
+t.testprint()
+
+
+# class Person(object):
+#     def
+#
+#
+#         self.name = name
+#         print(self.name)
+#
+#     def say_something(self):
+#         print("hello")
+#
+#
+# person = Person()
+# person.say_something()

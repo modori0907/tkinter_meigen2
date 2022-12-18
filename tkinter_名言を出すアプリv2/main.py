@@ -81,7 +81,7 @@ canvas.grid(row=0, column=0)
 start_button = Button(text="開始", highlightthickness=0, font=(FONT_NAMA, 15, "bold"), fg=GREEN, command=start_timer)
 start_button_img = PhotoImage()
 start_button.place(x=550, y=20)
-reset_botton = Button(text="停止", highlightthickness=0, font=(FONT_NAMA, 15, "bold"), fg=GREEN,command=stop_timer)
+reset_botton = Button(text="停止", highlightthickness=0, font=(FONT_NAMA, 15, "bold"), fg=GREEN, command=stop_timer)
 reset_botton.place(x=550, y=50)
 
 window.mainloop()
