@@ -6,7 +6,7 @@ from tkinter import messagebox
 # TODO　ソートして表示する処理
 # TODO  検索して表示する処理
 # TODO ENTERで実行処理
-
+# TODO 別の画面から呼び出す処理
 # Tkinter 事前処理
 meigens = Tk()
 
@@ -14,8 +14,12 @@ meigens = Tk()
 # カテゴリー選択時に表示される
 category_list = ["励まし", "落ち着く", "向上心"]
 
+search_category = ""
+
+
 con = sqlite3.connect('meigens.db')
 cursorObj = con.cursor()
+
 
 # DB作成
 cursorObj.execute(
@@ -31,25 +35,47 @@ def reset():
     make_window()
     my_meigen()
 
+def search_reset():
+    for cell in meigens.winfo_children():
+        cell.destroy()
+
+    make_window()
+    my_meigen(all_search=False)
+
+
 # ソートする処理
-def sorted_colum():
-    pass
-
-
-def my_meigen():
-    cursorObj.execute("SELECT * FROM meigens")
+def my_meigen(all_search=True):
+    # cursorObj.execute("SELECT * FROM meigens")
     # 全データを取得する。
-    meigens_list = cursorObj.fetchall()
+
+    # if all_search:
+    #     cursorObj.execute("SELECT * FROM meigens")
+    #     meigens_list = cursorObj.fetchall()
+    # else:
+    #     meigens_list = cursorObj.fetchall()
 
     # 名言のデータベースカラム更新用
+
+    def meigens_search():
+        if meigen_category_search.get() == "":
+            messagebox.showinfo("Search", "値を入力してください")
+        else:
+            global search_category
+            search_category = meigen_category_search.get()
+
+
+        search_reset()
 
     def delete_meigen():
 
         if len(cursorObj.execute("SELECT * FROM meigens WHERE id=?", (meigen_delete.get(),)).fetchall()) == 0:
             messagebox.showinfo("Delet", "該当データがありません")
 
+            con.commit()
+
         else:
             cursorObj.execute("DELETE FROM meigens WHERE id=?", (meigen_delete.get(),))
+            con.commit()
             messagebox.showinfo("Delete", "名言を削除しました")
 
         reset()
@@ -58,8 +84,10 @@ def my_meigen():
         if meigen_category_add.get() == "" or meigen_content_add.get() == "":
             messagebox.showinfo("Insert", "値を入力してください")
 
+            con.commit()
+
         else:
-            cursorObj.execute("INSERT INTO meigens(category,meigen,author) VALUES(?, ?, ?)", (meigen_up.get(),
+            cursorObj.execute("INSERT INTO meigens(category,meigen,author) VALUES(?, ?, ?)", (meigen_update_id.get(),
                                                                                     meigen_content_add.get(), meigen_author_add.get()))
             con.commit()
 
@@ -85,15 +113,20 @@ def my_meigen():
         reset()
 
 
+    meigen_row = 2
 
-
-
-    meigen_row = 1
-
-
+# ------- データディスプレイ処理 ------- #
+    if all_search:
+        cursorObj.execute("SELECT * FROM meigens")
+        meigens_list = cursorObj.fetchall()
+    else:
+        # cursorObj.execute("SELECT * FROM meigens WHERE category = '励まし'")
+        cursorObj.execute("SELECT * FROM meigens WHERE category = ?" , (search_category,))
+        meigens_list = cursorObj.fetchall()
 
 
     for meigen in meigens_list:
+
         meigen_id = Label(meigens, text=meigen[0])
         meigen_id.grid(row=meigen_row, column=0, sticky=N + S + E + W)
 
@@ -107,6 +140,19 @@ def my_meigen():
         author_content.grid(row=meigen_row, column=3, sticky=N + S + E + W)
 
         meigen_row += 1
+
+
+
+# ------- ボタン作成処理 ------- #
+    # 名言をソートする処理
+
+    meigen_category_search = ttk.Combobox(meigens, values=category_list)
+    meigen_category_search.grid(row=0, column=1)
+
+    meigen_search_button = Button(meigens, text="検索", command=meigens_search)
+    meigen_search_button.grid(row=0, column=4)
+
+    meigen_search_button.bind("<Return>", lambda event: meigens_search())
 
     # 名言のリストを追加する処理のボタン
 
@@ -155,21 +201,18 @@ def my_meigen():
     meigen_delete_button.bind("<Return>", lambda event: delete_meigen())
 
 
-
-
-
 def make_window():
     meigen_id = Label(meigens, text="ID")
-    meigen_id.grid(row=0, column=0, sticky=N + S + E + W)
+    meigen_id.grid(row=1, column=0, sticky=N + S + E + W)
 
     meigen_category = Label(meigens, text="Category")
-    meigen_category.grid(row=0, column=1, sticky=N + S + E + W)
+    meigen_category.grid(row=1, column=1, sticky=N + S + E + W)
 
     meigen_content = Label(meigens, text="Meigen")
-    meigen_content.grid(row=0, column=2, sticky=N + S + E + W)
+    meigen_content.grid(row=1, column=2, sticky=N + S + E + W)
 
     author_content = Label(meigens, text="Author")
-    author_content.grid(row=0, column=3, sticky=N + S + E + W)
+    author_content.grid(row=1, column=3, sticky=N + S + E + W)
 
 
 
