@@ -29,7 +29,16 @@ class Application(tk.Frame):
 
         # 開始ボタン
         # lambdaを入れないとエラーになる。selfを入れないとエラーになる
-        # TODO なぜlambdaを使うのかを理解する
+
+        # url:https://teratail.com/questions/248497
+        # Enterキー入力は < Return > をbindすることで出来ます
+        #
+        # self.bt.bind("<Return>", lambda event: self.print_txtval())
+        # print_txtvalは引数を取らないので、lambdaで囲って
+        # 引数に渡されるeventを無視するようにしています。
+        #
+
+
         self.power_button = tk.Button(self, text="Start", command=lambda: self.start())
         self.power_button.grid(row=3, column=0, sticky="NE")
 

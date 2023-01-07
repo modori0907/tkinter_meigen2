@@ -5,6 +5,7 @@ from tkinter import messagebox
 
 # TODO　ソートして表示する処理
 # TODO  検索して表示する処理
+# TODO ENTERで実行処理
 
 # Tkinter 事前処理
 meigens = Tk()
@@ -54,20 +55,43 @@ def my_meigen():
         reset()
 
     def insert_meigen():
-        # TODO 値のあるなしを判定する処理を入れる
         if meigen_category_add.get() == "" or meigen_content_add.get() == "":
             messagebox.showinfo("Insert", "値を入力してください")
 
         else:
-            cursorObj.execute("INSERT INTO meigens(category,meigen) VALUES(?, ?)", (meigen_category_add.get(),
-                                                                                    meigen_content_add.get()))
+            cursorObj.execute("INSERT INTO meigens(category,meigen,author) VALUES(?, ?, ?)", (meigen_up.get(),
+                                                                                    meigen_content_add.get(), meigen_author_add.get()))
             con.commit()
 
             messagebox.showinfo("Insert", "名言を追加しました")
 
         reset()
 
+    def update_meigen():
+
+        if meigen_update_id.get() == "":
+            messagebox.showinfo("Insert", "値を入力してください")
+
+        else:
+            if len(cursorObj.execute("SELECT * FROM meigens WHERE id=?", (meigen_update_id.get(),)).fetchall()) == 0:
+                messagebox.showinfo("Delet", "該当データがありません")
+            else:
+                cursorObj.execute("UPDATE meigens SET category=?,meigen=?,author=? WHERE id=?", (meigen_category_update.get(),
+                                                                                        meigen_content_update.get(), meigen_author_update.get(), meigen_update_id.get()))
+                con.commit()
+
+                messagebox.showinfo("Insert", "更新しました")
+
+        reset()
+
+
+
+
+
     meigen_row = 1
+
+
+
 
     for meigen in meigens_list:
         meigen_id = Label(meigens, text=meigen[0])
@@ -92,16 +116,46 @@ def my_meigen():
     meigen_content_add = Entry(meigens, borderwidth=2, relief="groove")
     meigen_content_add.grid(row=meigen_row + 1, column=2, sticky=N + S + E + W)
 
+    meigen_author_add = Entry(meigens, borderwidth=2, relief="groove")
+    meigen_author_add.grid(row=meigen_row + 1, column=3, sticky=N + S + E + W)
+
     meigen_add_button = Button(meigens, text="追加", command=insert_meigen)
     meigen_add_button.grid(row=meigen_row + 1, column=4)
 
+    meigen_add_button.bind("<Return>", lambda event: insert_meigen())
+    # url:https://teratail.com/questions/248497
+
+    # 名言を更新する処理
+
+    meigen_update_id = Entry(meigens, borderwidth=2, relief="groove")
+    meigen_update_id.grid(row=meigen_row + 2, column=0)
+
+    meigen_category_update = ttk.Combobox(meigens, values=category_list)
+    meigen_category_update.grid(row=meigen_row + 2, column=1)
+
+    meigen_content_update = Entry(meigens, borderwidth=2, relief="groove")
+    meigen_content_update.grid(row=meigen_row + 2, column=2, sticky=N + S + E + W)
+
+    meigen_author_update = Entry(meigens, borderwidth=2, relief="groove")
+    meigen_author_update.grid(row=meigen_row + 2, column=3, sticky=N + S + E + W)
+
+    meigen_update_button = Button(meigens, text="更新", command=update_meigen)
+    meigen_update_button.grid(row=meigen_row + 2, column=4)
+
+    meigen_update_button.bind("<Return>", lambda event: update_meigen())
+
+
     # 名言のリストを削除する処理のボタン
-    # TODO トライ処理を入れる。失敗したときにメッセージを入れる
     meigen_delete = Entry(meigens, borderwidth=2, relief="groove")
     meigen_delete.grid(row=meigen_row + 3, column=0)
 
     meigen_delete_button = Button(meigens, text="名言削除", bg="#142E54", command=delete_meigen)
     meigen_delete_button.grid(row=meigen_row + 3, column=4, sticky=N + S + E + W)
+
+    meigen_delete_button.bind("<Return>", lambda event: delete_meigen())
+
+
+
 
 
 def make_window():
