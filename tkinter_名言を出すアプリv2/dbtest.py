@@ -87,7 +87,7 @@ def my_meigen(all_search=True):
             con.commit()
 
         else:
-            cursorObj.execute("INSERT INTO meigens(category,meigen,author) VALUES(?, ?, ?)", (meigen_update_id.get(),
+            cursorObj.execute("INSERT INTO meigens(category,meigen,author) VALUES(?, ?, ?)", (meigen_category_add.get(),
                                                                                     meigen_content_add.get(), meigen_author_add.get()))
             con.commit()
 
