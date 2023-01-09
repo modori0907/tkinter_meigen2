@@ -44,15 +44,15 @@ def delete():
         cursorObj.execute("DELETE FROM meigens WHERE id=?", (values,))  # idで削除
         con.commit()
 
+    # 表示内容を更新する処理
+    for item_id in selected_ids:
+        tree.delete(item_id)
+
     # # DBを更新する処理
     # print(len(selected_ids))
     # selected_item_ids = tree.selection()[0] # 選択しているIDを取得する
     # values = tuple(tree.item(selected_item_ids)['values'])[0]
     # print(values)
-
-    # 表示内容を更新する処理
-    for item_id in selected_ids:
-        tree.delete(item_id)
 
     # 選択したアイテムから値を取得する処理
     # URL:https://www.web-dev-qa-db-ja.com/ja/python/treeviewtkinter%E3%81%AE%E3%82%A2%E3%82%A4%E3%83%86%E3%83%A0%E3%82%92%E5%89%8A%E9%99%A4%E3%81%8A%E3%82%88%E3%81%B3%E7%B7%A8%E9%9B%86%E3%81%99%E3%82%8B/1055640459/
@@ -70,7 +70,11 @@ def delete():
 
 # データベースの中身をツリービューに表示する関数
 def reflect_database():
-    #
+    # この処理を入れないと随時更新されときに全部が表に追加されてしまう
+    # URL:https://www.web-dev-qa-db-ja.com/ja/python/tkinter%E3%81%A7%E3%83%84%E3%83%AA%E3%83%BC%E3%83%93%E3%83%A5%E3%83%BC%E5%85%A8%E4%BD%93%E3%82%92%E3%82%AF%E3%83%AA%E3%82%A2%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95/1046467846/
+    for i in tree.get_children():
+        tree.delete(i)
+
     cursorObj.execute("SELECT * FROM meigens")
     meigens_list = cursorObj.fetchall()
     for meigen in meigens_list:
@@ -100,7 +104,7 @@ def add():
 def add_window():
     global data_category, data_content, data_author, add_subwindow
     add_subwindow = tkinter.Toplevel()
-    add_subwindow.geometry("400x400")
+    add_subwindow.geometry("500x300")
     add_subwindow.title("データ追加")
 
     date_category_label = tkinter.Label(add_subwindow, text="カテゴリー")
@@ -121,24 +125,87 @@ def add_window():
     save_button = tkinter.Button(add_subwindow, text='保存', command=add_row)
     save_button.grid(row=3, column=0, columnspan=2)
 
+    save_button.bind("<Return>", lambda event: add_row())
+
 
 # 行を追加する処理
 def add_row():
     new_category = data_category.get()
     new_content = data_content.get()
     new_author = data_author.get()
-    # new_date =[99, new_category, new_content, new_author]
-    # insert_date(new_date)
     cursorObj.execute("INSERT INTO meigens(category,meigen,author) VALUES(?, ?, ?)",
                       (new_category, new_content, new_author))
     con.commit()
-    reflect_database() # 追加したデータを一覧に反映させる処理
+    reflect_database()  # 追加したデータを一覧に反映させる処理
     add_subwindow.destroy()  # サブウィンドウを閉じる処理
 
     add_button.config(state='normal')
     edit_button.config(state='normal')
     delete_button.config(state='normal')
 
+
+# ツリービューのデータを編集する関数
+def edit():
+    global selected_id
+    selected_id = tree.selection()[0]
+    if len(selected_id) > 0:  # 選択されていれば処理を開始する
+        selected_data = tree.item(selected_id, 'values')  # 選択した行のデータを取得している
+        edit_window(selected_data)
+
+
+# 編集ウインドウを作成する
+def edit_window(selected_data):
+    global data_category, data_content, data_author, edit_subwindow, data_id
+    edit_subwindow = tkinter.Toplevel()
+    edit_subwindow.geometry("500x300")
+    edit_subwindow.title("データ編集")
+
+    date_category_label = tkinter.Label(edit_subwindow, text="カテゴリー")
+    data_category = ttk.Combobox(edit_subwindow, values=category_list)
+    date_category_label.grid(row=0, column=0, padx=10, pady=20)
+    data_category.grid(row=0, column=1, padx=10, pady=20)
+
+    data_category.insert(0, selected_data[1])
+
+    date_content_label = tkinter.Label(edit_subwindow, text="内容")
+    data_content = tkinter.Entry(edit_subwindow)
+    date_content_label.grid(row=1, column=0, padx=10, pady=20)
+    data_content.grid(row=1, column=1, padx=10, pady=20)
+
+    data_content.insert(0, selected_data[2])
+
+    date_author_label = tkinter.Label(edit_subwindow, text="著者")
+    data_author = tkinter.Entry(edit_subwindow)
+    date_author_label.grid(row=2, column=0, padx=10, pady=20)
+    data_author.grid(row=2, column=1, padx=10, pady=20)
+
+    data_author.insert(0, selected_data[3])
+
+    # 　edit_row関数にIDを引き渡す用
+    data_id = selected_data[0]
+
+    save_button = tkinter.Button(edit_subwindow, text='保存', command=edit_row)
+    save_button.grid(row=3, column=0, columnspan=2)
+    save_button.bind("<Return>", lambda event: edit_row())
+
+
+def edit_row():
+    tree.delete(selected_id)
+
+    new_category = data_category.get()
+    new_content = data_content.get()
+    new_author = data_author.get()
+
+    cursorObj.execute("UPDATE meigens SET category=?,meigen=?,author=? WHERE id=?",
+                      (new_category, new_content, new_author, data_id))
+    con.commit()
+
+    reflect_database()  # 追加したデータを一覧に反映させる処理
+    edit_subwindow.destroy()  # サブウィンドウを閉じる処理
+
+    add_button.config(state='normal')
+    edit_button.config(state='normal')
+    delete_button.config(state='normal')
 
 
 # フレームの作成
@@ -170,8 +237,13 @@ tree.pack(pady=20)
 
 # テーブルデータ編集に関するボタンの作成
 add_button = tkinter.Button(button_frame, text='追加', borderwidth=2, command=add)
-edit_button = tkinter.Button(button_frame, text='編集', borderwidth=2)
+add_button.bind("<Return>", lambda event: add())
+
+edit_button = tkinter.Button(button_frame, text='編集', borderwidth=2, command=edit)
+edit_button.bind("<Return>", lambda event: edit())
+
 delete_button = tkinter.Button(button_frame, text='削除', borderwidth=2, command=delete)
+delete_button.bind("<Return>", lambda event: delete())
 
 add_button.grid(row=0, column=0, padx=5, pady=15, ipadx=5)
 edit_button.grid(row=0, column=1, padx=5, pady=15, ipadx=5)
