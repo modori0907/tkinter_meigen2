@@ -12,13 +12,13 @@ import tkinter.ttk as ttk
 
 # ウィンドウの作成
 root = tkinter.Tk()
-root.title('test')
+root.title('Make Meigen')
 root.geometry('700x350')
 root.resizable(0, 0)
 
 # DATABSE_FILE = 'money_database.csv'
 DATA = []
-category_list = ["励まし", "落ち着く", "向上心"]
+category_list = ["励まし", "落ち着く", "向上心", "成長"]
 
 # DB作成
 con = sqlite3.connect('meigens.db')
