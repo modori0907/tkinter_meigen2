@@ -1,14 +1,15 @@
-import tkinter as tk
-from tkinter import Canvas, PhotoImage
-import tkinter.messagebox
-
+import csv
+import datetime
 # MODORI4
 import sqlite3
-import tkinter.ttk as ttk
+import tkinter as tk
+import tkinter.messagebox
 
+
+# TODO(m4) サブウインドウを開いて、コメント、成果を入れる
 
 class Application(tk.Frame):
-    category_list = ["励", "静", "感"]
+    category_list = ["褒めてあげたい", "頑張った", "普通", "不満", "だめだ"]
 
     # masterはTKINTERの全体オブジェクト。
     def __init__(self, meigens, master, *args, **kwargs):
@@ -21,13 +22,17 @@ class Application(tk.Frame):
         self.secs = 0
         self.build_interface()
 
-# MODORI
+        # M4
         self.n = 0  # 名言をリストから表示させるための処理
-        self.meigens = meigens # 名言リストの初期化
+        self.meigens = meigens  # 名言リストの初期化
+        self.start_time = ""  # 開始時間
+        self.end_time = "" # 終了時間
+        self.impression = "" # 感想
+        self.comment = "" # 終わった時の感想
 
     def build_interface(self):
 
-        self.meigen = tk.Label(self,text="")
+        self.meigen = tk.Label(self, text="")
         self.meigen.grid(row=0, column=1)
 
         # 　時間入力
@@ -56,10 +61,8 @@ class Application(tk.Frame):
         # self.category_button = tk.ttk.Combobox(self, values=self.category_list, width=4)
         # self.category_button.grid(row=4, column=2, sticky="NW")
 
-
         self.quit_button = tk.Button(self, text="Quit", command=lambda: self.quit())
         self.quit_button.grid(row=4, column=3, sticky="NE")
-
 
         # self.pause_button = tk.Button(self, text="Pause", command=lambda: self.pause())
         # self.pause_button.grid(row=3, column=2, sticky="NW")
@@ -73,6 +76,42 @@ class Application(tk.Frame):
         self.master.bind("<Return>", lambda x: self.start())
         self.time_entry.bind("<Key>", lambda v: self.update())
 
+    # TODO: make subwindow
+
+    def write_results(self):
+        self.write_results = tkinter.Toplevel()
+        self.write_results.geometry("200x100")
+        self.write_results.title("I've tried!")
+
+        impression_label = tkinter.Label(self.write_results, text="感想")
+
+
+
+
+        # end_time = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+        end_time = datetime.datetime.now()
+        difference_time = ((end_time - self.start_time).seconds) // 60
+
+    def write_result_add(self):
+
+
+
+
+
+
+
+
+
+
+        with open('life_log.csv', 'w+', newline="") as f:
+            fwriter = csv.writer(f, delimiter=",")
+            # datetimeの引き算はtimedeltaのオブジェクトになる。そのままだとmilsesecondsまで表示されてしまうので、minuteのオプションをつけて、分のみ表示させるようにした。
+            fwriter.writerow(
+                [end_time.strftime('%Y/%m/%d'), self.start_time.strftime('%H:%M:%S'), end_time.strftime('%H:%M:%S'),
+                 difference_time, "Good", "強い気持ちで頑張りますね"])
+
+
+
     def calculate(self):
         """time calculation"""
         # 取得した値をsecを変換
@@ -81,6 +120,8 @@ class Application(tk.Frame):
         self.mins = (self.time // 60) % 60
         self.secs = self.time % 60
         # {:02d}とは。書式設定。dは整数。0は埋め。2は桁数を指定。:は前に入れる.入れないと更新されない
+        # 開始時間の取得
+        self.set_time = "{:02d}:{:02d}:{:02d}".format(self.hours, self.mins, self.secs)
         return "{:02d}:{:02d}:{:02d}".format(self.hours, self.mins, self.secs)
 
     def update(self):
@@ -104,13 +145,15 @@ class Application(tk.Frame):
         if self.running:
             if self.time <= 0:
                 self.clock.configure(text="Time's up!")
-                self.master.attributes("-topmost", True)  # メインウインドウを最前面に出す処理
+                # self.master.attributes("-topmost", True)  # メインウインドウを最前面に出す処理
+                self.write_results()
+
             else:
                 self.clock.configure(text=self.calculate())
                 self.time -= 1
                 self.after(1000, self.timer)
 
-# MODORI4
+    # MODORI4
 
     def display_meigen(self):
         """
@@ -137,14 +180,16 @@ class Application(tk.Frame):
         # 1秒間隔で秒数を下げる
 
         if self.running:
-            if len(meigen_list) == self.n:
+            if self.time <= 0:
+                self.meigen.configure(text="")
+
+            elif len(meigen_list) == self.n:
                 self.n = 0
                 self.after(10000, self.meigen_timer)
             else:
                 self.meigen.configure(text=self.meigens[self.n], wraplength=200, anchor="e", justify="left")
                 self.n += 1
                 self.after(10000, self.meigen_timer)
-
 
     def start(self):
         """start timer"""
@@ -165,14 +210,15 @@ class Application(tk.Frame):
 
         # startを押した後にStopボタンに変換して、コマンドもstopにする
         self.power_button.configure(text="Stop", command=lambda: self.stop())
+        self.master.attributes("-topmost", False)  # メインウインドウを最前面に出さない処理、終了時出すようにしているので。
         # Enterで操作したときの動き
         self.master.bind("<Return>", lambda x: self.stop())
         self.running = True
         # timerを呼び出す。
-        # timerは
         self.timer()
-#MODORI4
+        # M4
         self.meigen_timer()
+        self.start_time = datetime.datetime.now()
 
     def stop(self):
         """Stop timer"""
@@ -197,11 +243,10 @@ class Application(tk.Frame):
             root.destroy()
 
 
-
 # この関数を直接読んだ場合、以下のコードを実行する。
 if __name__ == "__main__":
     """Main loop of timer"""
-# MODORI4
+    # MODORI4
     # DB接続
     meigen_list = []
     con = sqlite3.connect('meigens.db')
@@ -220,7 +265,6 @@ if __name__ == "__main__":
     Application(master=root, meigens=meigen_list).pack()
     # Application(master=root, meigens=meigen_list).pack(side="top", fill="both", expand=True)
     root.mainloop()
-
 
 """
 参照
