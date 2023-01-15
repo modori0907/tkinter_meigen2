@@ -4,9 +4,12 @@ import datetime
 import sqlite3
 import tkinter as tk
 import tkinter.messagebox
+import tkinter.ttk as ttk
 
 
 # TODO(m4) サブウインドウを開いて、コメント、成果を入れる
+# TODO(m4) 機械学習をいれる。コメントなどをみて。曜日も入れるか
+# TODO(m4) アマゾンの予定と連携するようにしたい
 
 class Application(tk.Frame):
     category_list = ["褒めてあげたい", "頑張った", "普通", "不満", "だめだ"]
@@ -26,9 +29,9 @@ class Application(tk.Frame):
         self.n = 0  # 名言をリストから表示させるための処理
         self.meigens = meigens  # 名言リストの初期化
         self.start_time = ""  # 開始時間
-        self.end_time = "" # 終了時間
-        self.impression = "" # 感想
-        self.comment = "" # 終わった時の感想
+        self.end_time = ""  # 終了時間
+        self.impression = ""  # 感想
+        self.comment = ""  # 終わった時の感想
 
     def build_interface(self):
 
@@ -80,37 +83,59 @@ class Application(tk.Frame):
 
     def write_results(self):
         self.write_results = tkinter.Toplevel()
-        self.write_results.geometry("200x100")
+        self.write_results.geometry("300x100")
+        # xボタンを無効化する処理（表示はされるが押しても有効にならない）
+        # 参照URL: https://teratail.com/questions/139235
+        self.write_results.protocol('WM_DELETE_WINDOW', (lambda: 'pass')())
         self.write_results.title("I've tried!")
 
-        impression_label = tkinter.Label(self.write_results, text="感想")
+        self.impression_label = tkinter.Label(self.write_results, text="感想")
+        self.impression_label.grid(row=0, column=0, padx=2, pady=3)
 
+        self.impression = tkinter.ttk.Combobox(self.write_results, values=self.category_list)
+        self.impression.grid(row=0, column=1, padx=2, pady=2)
 
+        self.comment_label = tkinter.Label(self.write_results, text="一言")
+        self.comment_label.grid(row=1, column=0, padx=2, pady=3)
 
+        self.comment = tkinter.Entry(self.write_results)
+        self.comment.grid(row=1, column=1, padx=2, pady=3)
+
+        self.save_button = tkinter.Button(self.write_results, text="保存", command=lambda: self.write_result_add())
+        self.save_button.grid(row=2, column=0, padx=2, sticky="N")
 
         # end_time = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-        end_time = datetime.datetime.now()
-        difference_time = ((end_time - self.start_time).seconds) // 60
 
     def write_result_add(self):
 
+        """
+        結果をcsvファイルに出力する処理
+        :return:
+        """
 
+        end_time = datetime.datetime.now()
+        date = end_time.strftime('%Y/%m/%d')
+        week_of_day = end_time.strftime('%a')
 
+        self.difference_time = ((end_time - self.start_time).seconds) // 60
 
-
-
-
-
-
-
-        with open('life_log.csv', 'w+', newline="") as f:
+        with open('life_log.csv', 'a', newline="") as f:
             fwriter = csv.writer(f, delimiter=",")
-            # datetimeの引き算はtimedeltaのオブジェクトになる。そのままだとmilsesecondsまで表示されてしまうので、minuteのオプションをつけて、分のみ表示させるようにした。
+            # datetimeの引き算はtimedeltaのオブジェクトになる。そのままだとmilsesecondsまで表示されてしまうので、
+            # minuteのオプションをつけて、分のみ表示させるようにした。
+
             fwriter.writerow(
-                [end_time.strftime('%Y/%m/%d'), self.start_time.strftime('%H:%M:%S'), end_time.strftime('%H:%M:%S'),
-                 difference_time, "Good", "強い気持ちで頑張りますね"])
+                [date, week_of_day, self.start_time.strftime('%H:%M:%S'),
+                 end_time.strftime('%H:%M:%S'),
+                 self.difference_time, self.impression.get(), self.comment.get()])
 
+        # ウインドウを閉じる処理
+        self.write_results.destroy()
 
+        # ２回目にサブウィンドウを開こうとするとエラーになってしまう。
+        # （TypeError: 'Toplevel' object is not callable)
+        # これを防ぐため、一旦オブジェクトを削除することにした
+        del self.write_results
 
     def calculate(self):
         """time calculation"""
